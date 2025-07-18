@@ -59,10 +59,7 @@ export function LoginForm() {
             Sign in with Google
           </Button>
           
-          <div className="text-center text-sm text-gray-500 mt-4">
-            <p>For clients: Use your Google account</p>
-            <p>For admins: Use your authorized email</p>
-          </div>
+       
         </CardContent>
       </Card>
     </div>
