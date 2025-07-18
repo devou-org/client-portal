@@ -220,9 +220,9 @@ export const invoiceService = {
       console.log('Creating invoice with data:', invoiceData);
       
       // Clean the data to remove undefined values
-      const cleanedData: any = {};
+      const cleanedData: Record<string, unknown> = {};
       Object.keys(invoiceData).forEach(key => {
-        const value = (invoiceData as any)[key];
+        const value = (invoiceData as Record<string, unknown>)[key];
         if (value !== undefined) {
           cleanedData[key] = value;
         }
@@ -353,8 +353,8 @@ export const invoiceService = {
 };
 
 // Helper function to clean data by removing undefined values
-const cleanDocumentData = (data: any): any => {
-  const cleaned: any = {};
+const cleanDocumentData = (data: Record<string, unknown>): Record<string, unknown> => {
+  const cleaned: Record<string, unknown> = {};
   Object.keys(data).forEach(key => {
     if (data[key] !== undefined) {
       cleaned[key] = data[key];
@@ -407,14 +407,8 @@ export const documentService = {
     try {
       console.log('Creating document with data:', documentData);
       
-      // Clean the data to remove undefined values
-      const cleanedData: any = {};
-      Object.keys(documentData).forEach(key => {
-        const value = (documentData as any)[key];
-        if (value !== undefined) {
-          cleanedData[key] = value;
-        }
-      });
+      // Clean the data to remove undefined values using the helper function
+      const cleanedData = cleanDocumentData(documentData as Record<string, unknown>);
       
       console.log('Cleaned document data:', cleanedData);
       
