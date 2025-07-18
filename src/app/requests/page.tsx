@@ -216,7 +216,7 @@ export default function ServiceRequestsPage() {
                 <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No Service Requests</h3>
                 <p className="text-gray-500">
-                  You haven't submitted any service requests yet. Use the form above to submit your first request.
+                  You haven&apos;t submitted any service requests yet. Use the form above to submit your first request.
                 </p>
               </CardContent>
             </Card>
