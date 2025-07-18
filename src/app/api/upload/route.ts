@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       console.error('No file provided');
+
       return NextResponse.json(
         { error: 'No file provided' },
         { status: 400 }
@@ -35,10 +36,23 @@ export async function POST(request: NextRequest) {
 
     console.log('Uploading to Vercel Blob with filename:', filename);
 
+    // Check for token
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    if (!token) {
+      console.error('BLOB_READ_WRITE_TOKEN not found in environment variables');
+      return NextResponse.json(
+        { error: 'Vercel Blob token not configured' },
+        { status: 500 }
+      );
+    }
+
+    console.log('Using token for upload (length):', token.length);
+
     // Upload to Vercel Blob
     const blob = await put(filename, file, {
       access: 'public',
       addRandomSuffix: false,
+      token: token
     });
 
     console.log('Upload successful, blob URL:', blob.url);

@@ -54,16 +54,30 @@ export class FileUploadService {
         throw new Error(validation.error);
       }
 
+      // Check for token
+      const token = process.env.BLOB_READ_WRITE_TOKEN;
+      if (!token) {
+        console.error('BLOB_READ_WRITE_TOKEN not found in environment variables');
+        throw new Error('Vercel Blob token not configured');
+      }
+
+      console.log('Using token for upload (length):', token.length);
+
       // Generate unique filename
       const timestamp = Date.now();
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
       const filename = `${folder}/${timestamp}-${sanitizedName}`;
 
+      console.log('Uploading to Vercel Blob with filename:', filename);
+
       // Upload to Vercel Blob
       const blob = await put(filename, file, {
         access: 'public',
         addRandomSuffix: false,
+        token: token
       });
+
+      console.log('Upload successful, blob URL:', blob.url);
 
       return {
         url: blob.url,
@@ -79,10 +93,26 @@ export class FileUploadService {
 
   static async deleteFile(url: string): Promise<void> {
     try {
-      await del(url);
+      console.log('Deleting file from Vercel Blob:', url);
+      
+      const token = process.env.BLOB_READ_WRITE_TOKEN;
+      if (!token) {
+        console.error('BLOB_READ_WRITE_TOKEN not found in environment variables');
+        throw new Error('Vercel Blob token not configured');
+      }
+
+      console.log('Using token for deletion (length):', token.length);
+      
+      await del(url, {
+        token: token
+      });
+      
+      console.log('File deleted successfully from Vercel Blob');
     } catch (error) {
-      console.error('Error deleting file:', error);
-      throw new Error(`Failed to delete file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Error deleting file from Vercel Blob:', error);
+      // Don't throw error to prevent blocking document/invoice deletion
+      // Just log the error and continue
+      console.warn('Blob deletion failed, but continuing with database deletion');
     }
   }
 
