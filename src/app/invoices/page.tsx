@@ -82,8 +82,18 @@ export default function InvoicesPage() {
   };
 
   const handleDownload = (invoice: Invoice) => {
-    if (invoice.fileUrl) {
-      window.open(invoice.fileUrl, '_blank');
+    const fileUrl = invoice.fileUrl || invoice.file_link;
+    if (fileUrl) {
+      // Create a temporary anchor element to force download
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = invoice.invoice_name || `invoice-${invoice.uid}`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      alert('File URL not available for download');
     }
   };
 

@@ -135,7 +135,7 @@ export default function ProjectsPage() {
             <Card key={project.uid} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">{project.name}</CardTitle>
+                  <CardTitle className="text-lg">{project.project_name}</CardTitle>
                   <Badge className={getStatusColor(project.status)}>
                     {project.status}
                   </Badge>

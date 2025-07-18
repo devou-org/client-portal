@@ -70,9 +70,19 @@ export default function DocumentsPage() {
     loadDocuments();
   };
 
-  const handleDownload = (document: Document) => {
-    if (document.file_link) {
-      window.open(document.file_link, '_blank');
+  const handleDownload = (doc: Document) => {
+    const fileUrl = doc.file_link;
+    if (fileUrl) {
+      // Create a temporary anchor element to force download
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = doc.filename || doc.name;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      alert('File URL not available for download');
     }
   };
 
