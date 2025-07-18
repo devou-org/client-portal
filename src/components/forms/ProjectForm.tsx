@@ -29,13 +29,13 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
     loadUsers();
     if (project) {
       setFormData({
-        name: project.name,
+        name: project.project_name,
         description: project.description,
         status: project.status,
-        startDate: project.startDate.toISOString().split('T')[0],
-        endDate: project.endDate ? project.endDate.toISOString().split('T')[0] : '',
+        startDate: project.start_date.toISOString().split('T')[0],
+        endDate: project.end_date ? project.end_date.toISOString().split('T')[0] : '',
         budget: project.budget?.toString() || '',
-        clientId: project.clientId || '',
+        clientId: project.uid || '',
       });
     }
   }, [project]);

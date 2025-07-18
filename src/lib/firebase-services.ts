@@ -358,10 +358,14 @@ export const documentService = {
     try {
       const documentsRef = collection(db, 'documents');
       const snapshot = await getDocs(query(documentsRef, orderBy('createdAt', 'desc')));
-      return snapshot.docs.map(doc => {
+      const documents = snapshot.docs.map(doc => {
         const data = convertTimestamps(doc.data());
-        return { uid: doc.id, ...data } as Document;
+        const document = { uid: doc.id, ...data } as Document;
+        console.log('Retrieved document:', document);
+        return document;
       });
+      console.log('Total documents retrieved:', documents.length);
+      return documents;
     } catch (error) {
       console.error('Error getting all documents:', error);
       throw error;
@@ -370,12 +374,14 @@ export const documentService = {
 
   async createDocument(documentData: Omit<FirebaseDocument, 'id'>): Promise<string> {
     try {
+      console.log('Creating document with data:', documentData);
       const documentsRef = collection(db, 'documents');
       const docRef = await addDoc(documentsRef, {
         ...documentData,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+      console.log('Document created with ID:', docRef.id);
       return docRef.id;
     } catch (error) {
       console.error('Error creating document:', error);

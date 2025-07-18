@@ -59,6 +59,8 @@ export function DocumentForm({ document, onSuccess, onCancel }: DocumentFormProp
   };
 
   const uploadFile = async (file: File): Promise<{ url: string; size: number; type: string }> => {
+    console.log('Starting file upload for:', file.name, 'Size:', file.size, 'Type:', file.type);
+    
     const formData = new FormData();
     formData.append('file', file);
 
@@ -67,13 +69,19 @@ export function DocumentForm({ document, onSuccess, onCancel }: DocumentFormProp
       body: formData,
     });
 
+    console.log('Upload response status:', response.status);
+
     if (!response.ok) {
-      throw new Error('Failed to upload file');
+      const errorText = await response.text();
+      console.error('Upload failed:', errorText);
+      throw new Error(`Failed to upload file: ${response.status} ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('Upload API response:', data);
+    
     return {
-      url: data.url,
+      url: data.data?.url || data.url,
       size: file.size,
       type: file.type,
     };
@@ -100,7 +108,9 @@ export function DocumentForm({ document, onSuccess, onCancel }: DocumentFormProp
       // Upload file if selected
       if (file) {
         setUploading(true);
+        console.log('Uploading file:', file.name);
         fileInfo = await uploadFile(file);
+        console.log('Upload result:', fileInfo);
         setUploading(false);
       }
 
@@ -113,12 +123,17 @@ export function DocumentForm({ document, onSuccess, onCancel }: DocumentFormProp
         description: formData.description || undefined,
       };
 
+      console.log('Document data to save:', documentData);
+
       if (document) {
         // Update existing document
+        console.log('Updating document:', document.uid);
         await documentService.updateDocument(document.uid, documentData);
       } else {
         // Create new document
+        console.log('Creating new document');
         const documentId = await documentService.createDocument(documentData);
+        console.log('Created document with ID:', documentId);
         
         // Assign document to client if selected
         if (formData.clientId) {

@@ -19,6 +19,7 @@ export interface Project {
   status: 'active' | 'completed' | 'on-hold' | 'cancelled';
   start_date: Date;
   end_date: Date;
+  budget?: number;
   description?: string;
   createdAt?: Date;
   updatedAt?: Date;
