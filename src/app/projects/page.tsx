@@ -149,12 +149,12 @@ export default function ProjectsPage() {
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-sm text-gray-500">
                     <Calendar className="h-4 w-4 mr-2" />
-                    Started: {new Date(project.startDate).toLocaleDateString()}
+                    Started: {new Date(project.start_date).toLocaleDateString()}
                   </div>
-                  {project.endDate && (
+                  {project.end_date && (
                     <div className="flex items-center text-sm text-gray-500">
                       <Calendar className="h-4 w-4 mr-2" />
-                      Due: {new Date(project.endDate).toLocaleDateString()}
+                      Due: {new Date(project.end_date).toLocaleDateString()}
                     </div>
                   )}
                   <div className="flex items-center text-sm text-gray-500">
