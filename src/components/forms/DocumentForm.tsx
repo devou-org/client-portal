@@ -59,11 +59,24 @@ export function DocumentForm({ document, onSuccess, onCancel }: DocumentFormProp
   };
 
   const uploadFile = async (file: File): Promise<{ url: string; size: number; type: string }> => {
-    console.log('Starting file upload for:', file.name, 'Size:', file.size, 'Type:', file.type);
+    console.log('=== STARTING FILE UPLOAD ===');
+    console.log('File details:', { name: file.name, size: file.size, type: file.type });
+    
+    // Test blob configuration first
+    console.log('Testing Vercel Blob configuration...');
+    const blobTest = await fetch('/api/test-blob');
+    const blobTestResult = await blobTest.json();
+    console.log('Blob test result:', blobTestResult);
+
+    if (!blobTestResult.configured) {
+      throw new Error('Vercel Blob not configured: ' + blobTestResult.error);
+    }
     
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('folder', 'documents');
 
+    console.log('Sending upload request to /api/upload...');
     const response = await fetch('/api/upload', {
       method: 'POST',
       body: formData,
@@ -73,18 +86,29 @@ export function DocumentForm({ document, onSuccess, onCancel }: DocumentFormProp
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Upload failed:', errorText);
+      console.error('Upload failed with status:', response.status);
+      console.error('Upload error response:', errorText);
       throw new Error(`Failed to upload file: ${response.status} ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Upload API response:', data);
+    console.log('Upload API response data:', data);
     
-    return {
-      url: data.data?.url || data.url,
+    if (!data.success || !data.data?.url) {
+      console.error('Upload response missing URL:', data);
+      throw new Error('Upload failed - no URL in response');
+    }
+
+    const result = {
+      url: data.data.url,
       size: file.size,
       type: file.type,
     };
+
+    console.log('Upload successful, returning:', result);
+    console.log('=== FILE UPLOAD COMPLETED ===');
+    
+    return result;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,25 +142,31 @@ export function DocumentForm({ document, onSuccess, onCancel }: DocumentFormProp
         name: formData.name,
         filename: file?.name || document?.filename || '',
         file_link: fileInfo?.url || '',
-        file_size: fileInfo?.size,
-        file_type: fileInfo?.type,
-        description: formData.description || undefined,
+        file_size: fileInfo?.size || 0,
+        file_type: fileInfo?.type || '',
+        description: formData.description || '',
       };
 
-      console.log('Document data to save:', documentData);
+      console.log('=== DOCUMENT DATA TO SAVE ===');
+      console.log('Document data:', documentData);
+      console.log('File link value:', documentData.file_link);
+      console.log('File link type:', typeof documentData.file_link);
+      console.log('File link length:', documentData.file_link?.length);
 
       if (document) {
         // Update existing document
-        console.log('Updating document:', document.uid);
+        console.log('Updating existing document:', document.uid);
         await documentService.updateDocument(document.uid, documentData);
+        console.log('Document updated successfully');
       } else {
         // Create new document
-        console.log('Creating new document');
+        console.log('Creating new document...');
         const documentId = await documentService.createDocument(documentData);
         console.log('Created document with ID:', documentId);
         
         // Assign document to client if selected
         if (formData.clientId) {
+          console.log('Assigning document to client:', formData.clientId);
           await documentService.assignDocumentToUser(documentId, formData.clientId);
         }
       }

@@ -217,12 +217,32 @@ export const invoiceService = {
 
   async createInvoice(invoiceData: Omit<FirebaseInvoice, 'id'>): Promise<string> {
     try {
-      const invoicesRef = collection(db, 'invoices');
-      const docRef = await addDoc(invoicesRef, {
-        ...invoiceData,
+      console.log('Creating invoice with data:', invoiceData);
+      
+      // Clean the data to remove undefined values
+      const cleanedData: any = {};
+      Object.keys(invoiceData).forEach(key => {
+        const value = (invoiceData as any)[key];
+        if (value !== undefined) {
+          cleanedData[key] = value;
+        }
+      });
+      
+      console.log('Cleaned invoice data:', cleanedData);
+      
+      // Ensure required fields have default values
+      const invoiceToSave = {
+        ...cleanedData,
+        file_link: cleanedData.file_link || '', // Default to empty string instead of undefined
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-      });
+      };
+      
+      console.log('Final invoice data to save:', invoiceToSave);
+      
+      const invoicesRef = collection(db, 'invoices');
+      const docRef = await addDoc(invoicesRef, invoiceToSave);
+      console.log('Invoice created with ID:', docRef.id);
       return docRef.id;
     } catch (error) {
       console.error('Error creating invoice:', error);
@@ -332,6 +352,17 @@ export const invoiceService = {
   },
 };
 
+// Helper function to clean data by removing undefined values
+const cleanDocumentData = (data: any): any => {
+  const cleaned: any = {};
+  Object.keys(data).forEach(key => {
+    if (data[key] !== undefined) {
+      cleaned[key] = data[key];
+    }
+  });
+  return cleaned;
+};
+
 // Document Services
 export const documentService = {
   async getUserDocuments(userUid: string): Promise<Document[]> {
@@ -375,12 +406,30 @@ export const documentService = {
   async createDocument(documentData: Omit<FirebaseDocument, 'id'>): Promise<string> {
     try {
       console.log('Creating document with data:', documentData);
-      const documentsRef = collection(db, 'documents');
-      const docRef = await addDoc(documentsRef, {
-        ...documentData,
+      
+      // Clean the data to remove undefined values
+      const cleanedData: any = {};
+      Object.keys(documentData).forEach(key => {
+        const value = (documentData as any)[key];
+        if (value !== undefined) {
+          cleanedData[key] = value;
+        }
+      });
+      
+      console.log('Cleaned document data:', cleanedData);
+      
+      // Ensure required fields have default values
+      const documentToSave = {
+        ...cleanedData,
+        file_link: cleanedData.file_link || '', // Default to empty string instead of undefined
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-      });
+      };
+      
+      console.log('Final document data to save:', documentToSave);
+      
+      const documentsRef = collection(db, 'documents');
+      const docRef = await addDoc(documentsRef, documentToSave);
       console.log('Document created with ID:', docRef.id);
       return docRef.id;
     } catch (error) {
