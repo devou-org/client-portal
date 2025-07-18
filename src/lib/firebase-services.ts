@@ -265,29 +265,42 @@ export const invoiceService = {
 
   async deleteInvoice(uid: string): Promise<void> {
     try {
+      console.log('=== DELETING INVOICE ===');
+      console.log('Invoice ID:', uid);
+      
       // First get the invoice to retrieve the file URL
       const invoiceRef = doc(db, 'invoices', uid);
       const invoiceSnap = await getDoc(invoiceRef);
       
       if (invoiceSnap.exists()) {
         const invoiceData = invoiceSnap.data() as FirebaseInvoice;
+        console.log('Invoice data:', invoiceData);
+        const fileUrl = invoiceData.file_link || invoiceData.fileUrl;
+        console.log('File URL to delete:', fileUrl);
         
         // Delete the file from Vercel Blob storage if it exists
-        if (invoiceData.file_link || invoiceData.fileUrl) {
+        if (fileUrl) {
           try {
+            console.log('Deleting file from Vercel Blob...');
             const { FileUploadService } = await import('@/lib/file-upload');
-            const fileUrl = invoiceData.file_link || invoiceData.fileUrl;
-            if (fileUrl) {
-              await FileUploadService.deleteFile(fileUrl);
-            }
+            await FileUploadService.deleteFile(fileUrl);
+            console.log('File deleted from Vercel Blob successfully');
           } catch (fileError) {
             console.error('Error deleting file from blob storage:', fileError);
             // Continue with invoice deletion even if file deletion fails
           }
+        } else {
+          console.log('No file URL found, skipping blob deletion');
         }
+      } else {
+        console.log('Invoice not found in Firestore');
       }
       
       // Delete the invoice from Firestore
+      console.log('Deleting invoice from Firestore...');
+      await deleteDoc(invoiceRef);
+      console.log('Invoice deleted from Firestore successfully');
+      console.log('=== INVOICE DELETION COMPLETED ===');
       await deleteDoc(invoiceRef);
     } catch (error) {
       console.error('Error deleting invoice:', error);
@@ -447,27 +460,41 @@ export const documentService = {
 
   async deleteDocument(uid: string): Promise<void> {
     try {
+      console.log('=== DELETING DOCUMENT ===');
+      console.log('Document ID:', uid);
+      
       // First get the document to retrieve the file URL
       const documentRef = doc(db, 'documents', uid);
       const documentSnap = await getDoc(documentRef);
       
       if (documentSnap.exists()) {
         const documentData = documentSnap.data() as FirebaseDocument;
+        console.log('Document data:', documentData);
+        console.log('File link to delete:', documentData.file_link);
         
         // Delete the file from Vercel Blob storage if it exists
         if (documentData.file_link) {
           try {
+            console.log('Deleting file from Vercel Blob...');
             const { FileUploadService } = await import('@/lib/file-upload');
             await FileUploadService.deleteFile(documentData.file_link);
+            console.log('File deleted from Vercel Blob successfully');
           } catch (fileError) {
             console.error('Error deleting file from blob storage:', fileError);
             // Continue with document deletion even if file deletion fails
           }
+        } else {
+          console.log('No file link found, skipping blob deletion');
         }
+      } else {
+        console.log('Document not found in Firestore');
       }
       
       // Delete the document from Firestore
+      console.log('Deleting document from Firestore...');
       await deleteDoc(documentRef);
+      console.log('Document deleted from Firestore successfully');
+      console.log('=== DOCUMENT DELETION COMPLETED ===');
     } catch (error) {
       console.error('Error deleting document:', error);
       throw error;

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { DevouLogo } from '@/components/ui/DevouLogo';
 import { LogIn, Loader2, AlertCircle } from 'lucide-react';
 
 export function LoginForm() {
@@ -27,11 +28,14 @@ export function LoginForm() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Welcome</CardTitle>
-          <CardDescription>
-            Sign in to access your portal
-          </CardDescription>
+        <CardHeader className="text-center space-y-4">
+          <DevouLogo className="mx-auto" size="lg" />
+          <div>
+            <CardTitle className="text-2xl font-bold">Welcome to Devou</CardTitle>
+            <CardDescription>
+              Sign in to access your portal
+            </CardDescription>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
