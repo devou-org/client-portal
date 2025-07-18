@@ -115,6 +115,7 @@ export interface CreateProjectForm {
   status: Project['status'];
   start_date: string;
   end_date: string;
+  budget?: number;
   description?: string;
 }
 

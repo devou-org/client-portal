@@ -30,7 +30,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
     if (project) {
       setFormData({
         name: project.project_name,
-        description: project.description,
+        description: project.description ?? '',
         status: project.status,
         startDate: project.start_date.toISOString().split('T')[0],
         endDate: project.end_date ? project.end_date.toISOString().split('T')[0] : '',
@@ -57,13 +57,13 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
 
     try {
       const projectData = {
-        name: formData.name,
+        project_name: formData.name,
         description: formData.description,
         status: formData.status as 'active' | 'completed' | 'on-hold' | 'cancelled',
-        startDate: new Date(formData.startDate),
-        endDate: formData.endDate ? new Date(formData.endDate) : undefined,
+        start_date: new Date(formData.startDate),
+        end_date: formData.endDate ? new Date(formData.endDate) : new Date(formData.startDate), // fallback to start_date if not provided
         budget: formData.budget ? parseFloat(formData.budget) : undefined,
-        clientId: formData.clientId || undefined,
+        uid: formData.clientId || undefined,
       };
 
       if (project) {
