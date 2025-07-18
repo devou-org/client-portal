@@ -71,17 +71,27 @@ export default function DocumentsPage() {
   };
 
   const handleDownload = (doc: Document) => {
+    console.log('Download requested for document:', doc);
     const fileUrl = doc.file_link;
+    console.log('File URL:', fileUrl);
+    
     if (fileUrl) {
-      // Create a temporary anchor element to force download
-      const link = document.createElement('a');
-      link.href = fileUrl;
-      link.download = doc.filename || doc.name;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        // Create a temporary anchor element to force download
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = doc.filename || doc.name;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error('Error downloading file:', error);
+        alert('Error downloading file. Please try again.');
+      }
     } else {
+      console.error('No file URL available for document:', doc);
       alert('File URL not available for download');
     }
   };

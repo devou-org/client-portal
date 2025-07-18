@@ -82,17 +82,27 @@ export default function InvoicesPage() {
   };
 
   const handleDownload = (invoice: Invoice) => {
+    console.log('Download requested for invoice:', invoice);
     const fileUrl = invoice.fileUrl || invoice.file_link;
+    console.log('File URL:', fileUrl);
+    
     if (fileUrl) {
-      // Create a temporary anchor element to force download
-      const link = document.createElement('a');
-      link.href = fileUrl;
-      link.download = invoice.invoice_name || `invoice-${invoice.uid}`;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        // Create a temporary anchor element to force download
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = invoice.invoice_name || `invoice-${invoice.uid}`;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error('Error downloading file:', error);
+        alert('Error downloading file. Please try again.');
+      }
     } else {
+      console.error('No file URL available for invoice:', invoice);
       alert('File URL not available for download');
     }
   };

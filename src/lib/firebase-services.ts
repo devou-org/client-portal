@@ -245,7 +245,30 @@ export const invoiceService = {
 
   async deleteInvoice(uid: string): Promise<void> {
     try {
-      await deleteDoc(doc(db, 'invoices', uid));
+      // First get the invoice to retrieve the file URL
+      const invoiceRef = doc(db, 'invoices', uid);
+      const invoiceSnap = await getDoc(invoiceRef);
+      
+      if (invoiceSnap.exists()) {
+        const invoiceData = invoiceSnap.data() as FirebaseInvoice;
+        
+        // Delete the file from Vercel Blob storage if it exists
+        if (invoiceData.file_link || invoiceData.fileUrl) {
+          try {
+            const { FileUploadService } = await import('@/lib/file-upload');
+            const fileUrl = invoiceData.file_link || invoiceData.fileUrl;
+            if (fileUrl) {
+              await FileUploadService.deleteFile(fileUrl);
+            }
+          } catch (fileError) {
+            console.error('Error deleting file from blob storage:', fileError);
+            // Continue with invoice deletion even if file deletion fails
+          }
+        }
+      }
+      
+      // Delete the invoice from Firestore
+      await deleteDoc(invoiceRef);
     } catch (error) {
       console.error('Error deleting invoice:', error);
       throw error;
@@ -375,7 +398,27 @@ export const documentService = {
 
   async deleteDocument(uid: string): Promise<void> {
     try {
-      await deleteDoc(doc(db, 'documents', uid));
+      // First get the document to retrieve the file URL
+      const documentRef = doc(db, 'documents', uid);
+      const documentSnap = await getDoc(documentRef);
+      
+      if (documentSnap.exists()) {
+        const documentData = documentSnap.data() as FirebaseDocument;
+        
+        // Delete the file from Vercel Blob storage if it exists
+        if (documentData.file_link) {
+          try {
+            const { FileUploadService } = await import('@/lib/file-upload');
+            await FileUploadService.deleteFile(documentData.file_link);
+          } catch (fileError) {
+            console.error('Error deleting file from blob storage:', fileError);
+            // Continue with document deletion even if file deletion fails
+          }
+        }
+      }
+      
+      // Delete the document from Firestore
+      await deleteDoc(documentRef);
     } catch (error) {
       console.error('Error deleting document:', error);
       throw error;
