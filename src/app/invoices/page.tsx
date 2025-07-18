@@ -159,7 +159,7 @@ export default function InvoicesPage() {
                   
                   <div className="flex items-center text-sm text-gray-500">
                     <Calendar className="h-4 w-4 mr-2" />
-                    Due: {new Date(invoice.dueDate).toLocaleDateString()}
+                    Due: {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'Not set'}
                   </div>
 
                   {invoice.description && (
