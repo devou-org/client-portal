@@ -64,20 +64,39 @@ export function InvoiceForm({ invoice, onSuccess, onCancel }: InvoiceFormProps) 
   };
 
   const uploadFile = async (file: File): Promise<string> => {
+    console.log('=== INVOICE FILE UPLOAD STARTED ===');
+    console.log('File details:', { name: file.name, size: file.size, type: file.type });
+    
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('folder', 'invoices');
 
+    console.log('Sending upload request...');
     const response = await fetch('/api/upload', {
       method: 'POST',
       body: formData,
     });
 
+    console.log('Upload response status:', response.status);
+
     if (!response.ok) {
-      throw new Error('Failed to upload file');
+      const errorText = await response.text();
+      console.error('Upload failed:', errorText);
+      throw new Error(`Failed to upload file: ${response.status} ${errorText}`);
     }
 
     const data = await response.json();
-    return data.url;
+    console.log('Upload API response:', data);
+    
+    if (!data.success || !data.data?.url) {
+      console.error('Upload response missing URL:', data);
+      throw new Error('Upload failed - no URL in response');
+    }
+
+    console.log('Upload successful, URL:', data.data.url);
+    console.log('=== INVOICE FILE UPLOAD COMPLETED ===');
+    
+    return data.data.url;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,8 +108,10 @@ export function InvoiceForm({ invoice, onSuccess, onCancel }: InvoiceFormProps) 
 
       // Upload file if selected
       if (file) {
+        console.log('Uploading invoice file:', file.name);
         setUploading(true);
         fileUrl = await uploadFile(file);
+        console.log('Invoice file upload result:', fileUrl);
         setUploading(false);
       }
 
@@ -101,8 +122,13 @@ export function InvoiceForm({ invoice, onSuccess, onCancel }: InvoiceFormProps) 
         status: formData.status as 'pending' | 'paid' | 'due' | 'overdue',
         description: formData.description || undefined,
         clientId: formData.clientId || undefined,
-        file_link: fileUrl,
+        file_link: fileUrl || '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
+
+      console.log('Invoice data to save:', invoiceData);
+      console.log('File link value:', invoiceData.file_link);
 
       if (invoice) {
         // Update existing invoice

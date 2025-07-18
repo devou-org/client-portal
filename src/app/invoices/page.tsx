@@ -158,12 +158,18 @@ export default function InvoicesPage() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {invoices.map((invoice) => (
+          {invoices.map((invoice) => {
+            // Debug log to see invoice structure
+            console.log('Invoice data:', invoice);
+            console.log('Invoice file_link:', invoice.file_link);
+            console.log('Invoice fileUrl:', invoice.fileUrl);
+            
+            return (
             <Card key={invoice.uid} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-lg">
-                    Invoice #{invoice.invoiceNumber}
+                    {invoice.invoice_name || `Invoice #${invoice.uid.slice(-6)}`}
                   </CardTitle>
                   <Badge className={getStatusColor(invoice.status)}>
                     {invoice.status}
@@ -191,7 +197,7 @@ export default function InvoicesPage() {
 
                 <div className="flex justify-between items-center">
                   <div className="flex gap-2">
-                    {invoice.fileUrl && (
+                    {(invoice.fileUrl || invoice.file_link) && (
                       <Button
                         size="sm"
                         variant="outline"
@@ -224,7 +230,8 @@ export default function InvoicesPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
 
         {invoices.length === 0 && (

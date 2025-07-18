@@ -145,6 +145,8 @@ export function DocumentForm({ document, onSuccess, onCancel }: DocumentFormProp
         file_size: fileInfo?.size || 0,
         file_type: fileInfo?.type || '',
         description: formData.description || '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       console.log('=== DOCUMENT DATA TO SAVE ===');
@@ -152,6 +154,12 @@ export function DocumentForm({ document, onSuccess, onCancel }: DocumentFormProp
       console.log('File link value:', documentData.file_link);
       console.log('File link type:', typeof documentData.file_link);
       console.log('File link length:', documentData.file_link?.length);
+      console.log('File info object:', fileInfo);
+
+      // Validate that we have a file URL before saving
+      if (!documentData.file_link) {
+        throw new Error('File upload failed - no file URL available');
+      }
 
       if (document) {
         // Update existing document
