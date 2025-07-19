@@ -87,7 +87,7 @@ export function Layout({ children }: LayoutProps) {
                 />
               </div>
               <div>
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900">Devou</h1>
+                <h1 className="text-lg  sm:text-xl font-bold text-gray-900">Devou</h1>
                 <p className="text-xs text-gray-500">
                   {isAdmin ? 'Admin Portal' : 'Client Portal'}
                 </p>
