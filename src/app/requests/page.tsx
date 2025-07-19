@@ -66,46 +66,46 @@ export default function ServiceRequestsPage() {
   return (
     <AuthGuard>
       <Layout>
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <ServiceRequestForm onSuccess={loadRequests} />
 
           {loading ? (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {[...Array(3)].map((_, i) => (
                 <Card key={i} className="animate-pulse">
-                  <CardContent className="p-6">
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2"></div>
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* To Do Column */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <Clock className="h-5 w-5 mr-2 text-gray-600" />
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-gray-600" />
                   To Do ({groupedRequests.todo.length})
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {groupedRequests.todo.map((request) => (
                     <Card key={request.uid} className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
+                      <CardContent className="p-3 sm:p-4">
                         <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-medium text-gray-900">{request.name}</h4>
+                          <h4 className="font-medium text-gray-900 text-sm sm:text-base line-clamp-2 flex-1">{request.name}</h4>
                           {request.priority && (
-                            <Badge className={getPriorityColor(request.priority)}>
+                            <Badge className={`${getPriorityColor(request.priority)} ml-2 flex-shrink-0 text-xs`}>
                               {request.priority}
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{request.request}</p>
-                        <p className="text-sm text-gray-500 mb-3">{request.description}</p>
+                        <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-2">{request.request}</p>
+                        <p className="text-xs sm:text-sm text-gray-500 mb-3 line-clamp-2">{request.description}</p>
                         <div className="flex items-center justify-between">
                           <Badge className={getStatusColor(request.status)}>
                             {getStatusIcon(request.status)}
-                            <span className="ml-1">{request.status}</span>
+                            <span className="ml-1 text-xs">{request.status}</span>
                           </Badge>
                           {request.createdAt && (
                             <span className="text-xs text-gray-400">
@@ -117,7 +117,7 @@ export default function ServiceRequestsPage() {
                     </Card>
                   ))}
                   {groupedRequests.todo.length === 0 && (
-                    <div className="text-center text-gray-500 py-8">
+                    <div className="text-center text-gray-500 py-6 sm:py-8 text-sm">
                       No pending requests
                     </div>
                   )}
@@ -126,8 +126,8 @@ export default function ServiceRequestsPage() {
 
               {/* In Progress Column */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <AlertCircle className="h-5 w-5 mr-2 text-blue-600" />
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-blue-600" />
                   In Progress ({groupedRequests['in-progress'].length})
                 </h3>
                 <div className="space-y-4">

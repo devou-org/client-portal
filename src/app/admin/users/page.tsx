@@ -21,7 +21,8 @@ import {
   FileText, 
   MessageSquare,
   Shield,
-  Users as UsersIcon
+  Users as UsersIcon,
+  RefreshCw
 } from 'lucide-react';
 
 interface UserStats {
@@ -113,13 +114,18 @@ export default function UsersPage() {
       return;
     }
 
-    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this user? This will remove them from the database. ' +
+      'Make sure to also delete them from Firebase Authentication console for complete removal.'
+    );
+
+    if (confirmDelete) {
       try {
-        // Note: In a real app, you'd want to handle user deletion more carefully
-        // including cleaning up related data and using Firebase Admin SDK
-        alert('User deletion would require Firebase Admin SDK implementation');
+        await userService.deleteUserAndCleanup(userId);
+        loadUsers(); // Refresh the user list
       } catch (error) {
         console.error('Error deleting user:', error);
+        alert('Failed to delete user. Please try again.');
       }
     }
   };
@@ -166,62 +172,94 @@ export default function UsersPage() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 space-y-4 sm:space-y-0">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-            <p className="text-gray-600 mt-1">Manage all users and their permissions</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">User Management</h1>
+            <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage all users and their permissions</p>
           </div>
-          <Button onClick={handleCreateUser} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Add User
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={loadUsers} 
+              variant="outline" 
+              className="flex items-center gap-2 text-xs sm:text-sm"
+              size="sm"
+            >
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Refresh</span>
+            </Button>
+            <Button onClick={handleCreateUser} className="flex items-center gap-2 text-xs sm:text-sm" size="sm">
+              <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Add User</span>
+              <span className="sm:hidden">Add</span>
+            </Button>
+          </div>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-3 gap-3 sm:gap-6 mb-4 sm:mb-6">
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center">
                 <div className="p-2 bg-blue-100 rounded-lg">
-                  <UsersIcon className="h-6 w-6 text-blue-600" />
+                  <UsersIcon className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" />
                 </div>
-                <div className="ml-4">
-                  <h3 className="text-2xl font-bold text-gray-900">{stats.totalUsers}</h3>
-                  <p className="text-gray-600">Total Users</p>
+                <div className="ml-2 sm:ml-4">
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-900">{stats.totalUsers}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm">Total Users</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center">
                 <div className="p-2 bg-green-100 rounded-lg">
-                  <UserIcon className="h-6 w-6 text-green-600" />
+                  <UserIcon className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
                 </div>
-                <div className="ml-4">
-                  <h3 className="text-2xl font-bold text-gray-900">{stats.totalClients}</h3>
-                  <p className="text-gray-600">Clients</p>
+                <div className="ml-2 sm:ml-4">
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-900">{stats.totalClients}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm">Clients</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center">
                 <div className="p-2 bg-purple-100 rounded-lg">
-                  <Shield className="h-6 w-6 text-purple-600" />
+                  <Shield className="h-4 w-4 sm:h-6 sm:w-6 text-purple-600" />
                 </div>
-                <div className="ml-4">
-                  <h3 className="text-2xl font-bold text-gray-900">{stats.totalAdmins}</h3>
-                  <p className="text-gray-600">Admins</p>
+                <div className="ml-2 sm:ml-4">
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-900">{stats.totalAdmins}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm">Admins</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Info Card */}
+        <Card className="mb-6 sm:mb-8 bg-blue-50 border-blue-200">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-start">
+              <div className="p-2 bg-blue-100 rounded-lg mr-3 sm:mr-4 flex-shrink-0">
+                <MessageSquare className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-blue-900 mb-2">User Management Information</h3>
+                <div className="text-sm text-blue-800 space-y-1">
+                  <p>• <strong>Register users:</strong> Create accounts in Firebase Authentication console</p>
+                  <p>• <strong>User login:</strong> Users login with email/password (provide name on first login)</p>
+                  <p>• <strong>Complete removal:</strong> Delete from both this panel AND Firebase Authentication</p>
+                  <p>• <strong>Admin detection:</strong> Based on email address in admin list</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {showForm && (
           <div className="mb-6">
@@ -326,6 +364,7 @@ export default function UsersPage() {
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
+                          
                           {user.uid !== currentUser?.uid && (
                             <Button
                               size="sm"

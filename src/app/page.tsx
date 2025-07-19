@@ -21,46 +21,26 @@ export default function Home() {
     }
   }, [user, isAdmin, loading, router]);
 
-  // Show login form if not authenticated
+  // Show login form if not authenticated - clean interface without layout
   if (!loading && !user) {
-    return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="max-w-md w-full space-y-8">
-            <div>
-              <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Welcome to Client Portal
-              </h2>
-              <p className="mt-2 text-center text-sm text-gray-600">
-                Please sign in to access your dashboard
-              </p>
-            </div>
-            <LoginForm />
-          </div>
-        </div>
-      </Layout>
-    );
+    return <LoginForm />;
   }
 
-  // Show loading state
+  // Show loading state - clean interface without layout
   if (loading) {
     return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-        </div>
-      </Layout>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
     );
   }
 
   // This will trigger the useEffect redirect above
   return (
-    <Layout>
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Redirecting...</h2>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-gray-900">Redirecting...</h2>
       </div>
-    </Layout>
+    </div>
   );
 }

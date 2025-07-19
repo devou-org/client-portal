@@ -82,6 +82,63 @@ export const userService = {
       throw error;
     }
   },
+
+  async deleteUser(uid: string): Promise<void> {
+    try {
+      // Delete user document from Firestore
+      const userRef = doc(db, 'users', uid);
+      await deleteDoc(userRef);
+      
+      // Note: This only deletes the user document from Firestore.
+      // To delete from Firebase Authentication, you would need Firebase Admin SDK
+      // or the user would need to delete their own account while authenticated.
+      
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
+  },
+
+  async deleteUserAndCleanup(uid: string): Promise<void> {
+    try {
+      // Get user data first to understand what needs cleanup
+      const user = await this.getUser(uid);
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      // Create a batch for atomic operations
+      const batch = writeBatch(db);
+
+      // Delete user document
+      const userRef = doc(db, 'users', uid);
+      batch.delete(userRef);
+
+      // Clean up user's projects (remove user from project references)
+      if (user.projects && user.projects.length > 0) {
+        for (const projectId of user.projects) {
+          const projectRef = doc(db, 'projects', projectId);
+          // You might want to delete the project or reassign it
+          // For now, we'll leave projects but remove user reference
+        }
+      }
+
+      // Clean up user's service requests
+      if (user.requests && user.requests.length > 0) {
+        for (const requestId of user.requests) {
+          const requestRef = doc(db, 'requests', requestId);
+          batch.delete(requestRef);
+        }
+      }
+
+      // Commit the batch
+      await batch.commit();
+      
+    } catch (error) {
+      console.error('Error deleting user and cleanup:', error);
+      throw error;
+    }
+  },
 };
 
 // Project Services

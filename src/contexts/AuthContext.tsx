@@ -3,8 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { 
   onAuthStateChanged, 
-  signInWithPopup, 
-  GoogleAuthProvider, 
+  signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   User as FirebaseUser
 } from 'firebase/auth';
@@ -12,6 +11,7 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { User, AuthContextType } from '@/types';
 import { isAdmin as checkIsAdmin } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -31,13 +31,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setLoading(true);
+      setAuthError(null);
       
       if (firebaseUser) {
-        await handleUserLogin(firebaseUser);
+        try {
+          await handleUserLogin(firebaseUser);
+        } catch (error) {
+          console.error('Auth error:', error);
+          setAuthError(error instanceof Error ? error.message : 'Authentication failed');
+          setUser(null);
+          setIsAdmin(false);
+        }
       } else {
         setUser(null);
         setIsAdmin(false);
@@ -49,19 +59,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return unsubscribe;
   }, []);
 
-  const handleUserLogin = async (firebaseUser: FirebaseUser) => {
+  const handleUserLogin = async (firebaseUser: FirebaseUser, name?: string) => {
     try {
       const userDocRef = doc(db, 'users', firebaseUser.uid);
       const userDoc = await getDoc(userDocRef);
 
-      let userData: User;
+      // Check if user is admin by email
+      const isUserAdmin = checkIsAdmin(firebaseUser.email || '');
 
       if (userDoc.exists()) {
-        // User exists, get their data
+        // User exists in database, update and login
         const existingData = userDoc.data();
-        userData = {
+        const userData: User = {
           uid: firebaseUser.uid,
-          name: existingData.name || firebaseUser.displayName || '',
+          name: existingData.name || name || '',
           email: firebaseUser.email || '',
           projects: existingData.projects || [],
           invoices: existingData.invoices || [],
@@ -71,18 +82,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
           updatedAt: existingData.updatedAt?.toDate(),
         };
 
-        // Update the document with any new info from Firebase Auth
+        // Update the document with any new info
         await setDoc(userDocRef, {
           ...existingData,
-          name: firebaseUser.displayName || existingData.name,
+          name: name || existingData.name,
           email: firebaseUser.email,
           updatedAt: serverTimestamp(),
         }, { merge: true });
+
+        setUser(userData);
+        setIsAdmin(isUserAdmin);
       } else {
-        // New user, create their document
-        userData = {
+        // User doesn't exist, create new user document
+        const userData: User = {
           uid: firebaseUser.uid,
-          name: firebaseUser.displayName || '',
+          name: name || '',
           email: firebaseUser.email || '',
           projects: [],
           invoices: [],
@@ -95,27 +109,35 @@ export function AuthProvider({ children }: AuthProviderProps) {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
-      }
 
-      setUser(userData);
-      setIsAdmin(checkIsAdmin(userData.email));
+        setUser(userData);
+        setIsAdmin(isUserAdmin);
+      }
     } catch (error) {
       console.error('Error handling user login:', error);
+      
+      // For any errors, sign out and show generic error
+      await firebaseSignOut(auth);
       setUser(null);
       setIsAdmin(false);
+      throw new Error('Login failed. Please try again.');
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithEmailPassword = async (email: string, password: string, name?: string) => {
     try {
-      const provider = new GoogleAuthProvider();
-      provider.addScope('email');
-      provider.addScope('profile');
+      const result = await signInWithEmailAndPassword(auth, email, password);
       
-      await signInWithPopup(auth, provider);
-      // User state will be updated through the onAuthStateChanged listener
+      // If name is provided (first time login), update the user document
+      if (name) {
+        await handleUserLogin(result.user, name);
+      }
+      // The user state will be updated through the onAuthStateChanged listener
+      
     } catch (error) {
-      console.error('Error signing in with Google:', error);
+      console.error('Error signing in with email/password:', error);
+      
+      // Re-throw the error so the UI can handle it
       throw error;
     }
   };
@@ -125,6 +147,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await firebaseSignOut(auth);
       setUser(null);
       setIsAdmin(false);
+      setAuthError(null);
+      // Redirect to login page
+      router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;
@@ -135,7 +160,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     user,
     loading,
     isAdmin,
-    signInWithGoogle,
+    authError,
+    signInWithEmailPassword,
     signOut,
   };
 
