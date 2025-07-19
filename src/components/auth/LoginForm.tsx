@@ -68,7 +68,7 @@ export function LoginForm() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
-              <p className="text-xs text-gray-500">Only fill this if it's your first time logging in</p>
+              <p className="text-xs text-gray-500">Only fill this if it&apos;s your first time logging in</p>
             </div>
             
             <div className="space-y-2">
@@ -112,7 +112,7 @@ export function LoginForm() {
           
           <div className="text-center text-sm text-gray-500 mt-4">
             <p className="text-xs">
-              Contact administrator if you don't have login credentials
+              Contact administrator if you don&apos;t have login credentials
             </p>
           </div>
         </CardContent>
