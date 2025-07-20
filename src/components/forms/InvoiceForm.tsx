@@ -263,7 +263,7 @@ export function InvoiceForm({ invoice, onSuccess, onCancel }: InvoiceFormProps) 
           )}
         </div>
         <p className="text-sm text-gray-500 mt-1">
-          Accepted formats: PDF, DOC, DOCX, JPG, PNG (max 10MB)
+          Accepted formats: PDF, DOC, DOCX, JPG, PNG (max 4MB)
         </p>
       </div>
 

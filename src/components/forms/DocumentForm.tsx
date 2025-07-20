@@ -255,7 +255,7 @@ export function DocumentForm({ document, onSuccess, onCancel }: DocumentFormProp
           )}
         </div>
         <p className="text-sm text-gray-500 mt-1">
-          Accepted formats: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, TXT (max 10MB)
+          Accepted formats: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, TXT (max 4MB)
         </p>
       </div>
 
