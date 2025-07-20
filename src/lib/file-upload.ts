@@ -2,7 +2,8 @@ import { put, del } from '@vercel/blob';
 import { FileUploadResult } from '@/types';
 
 export class FileUploadService {
-  private static readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  // Vercel Hobby plan limit is 4.5MB, but we use 4MB to be safe
+  private static readonly MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
   private static readonly ALLOWED_TYPES = [
     'application/pdf',
     'application/msword',
