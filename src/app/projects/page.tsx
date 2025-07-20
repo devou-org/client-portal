@@ -263,10 +263,9 @@ export default function ProjectsPage() {
                       </Button>
                     </div>
                   ) : (
-                    <Button size="sm" variant="outline">
-                      <Eye className="h-4 w-4 mr-1" />
-                      View Details
-                    </Button>
+                    <>
+                      
+                    </>
                   )}
                 </div>
               </CardContent>
