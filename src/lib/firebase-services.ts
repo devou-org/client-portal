@@ -208,33 +208,66 @@ export const projectService = {
 
   async deleteProject(uid: string): Promise<void> {
     try {
+      console.log('=== PROJECT SERVICE DELETE ===');
       console.log('Deleting project from Firestore:', uid);
       
-      // First, get all users and remove this project from their projects array
+      if (!uid) {
+        throw new Error('Project ID is required');
+      }
+      
+      // First, check if the project exists
+      const projectRef = doc(db, 'projects', uid);
+      const projectSnap = await getDoc(projectRef);
+      
+      if (!projectSnap.exists()) {
+        console.warn('Project not found:', uid);
+        throw new Error('Project not found');
+      }
+      
+      console.log('Project exists, proceeding with deletion...');
+      
+      // Get all users and remove this project from their projects array
+      console.log('Fetching all users to clean up project references...');
       const usersSnapshot = await getDocs(collection(db, 'users'));
       const batch = writeBatch(db);
       
+      let userUpdateCount = 0;
       usersSnapshot.docs.forEach(userDoc => {
         const userData = userDoc.data();
-        if (userData.projects && userData.projects.includes(uid)) {
+        if (userData.projects && Array.isArray(userData.projects) && userData.projects.includes(uid)) {
           console.log(`Removing project ${uid} from user ${userDoc.id}`);
           const updatedProjects = userData.projects.filter((projectId: string) => projectId !== uid);
           batch.update(userDoc.ref, { 
             projects: updatedProjects,
             updatedAt: serverTimestamp()
           });
+          userUpdateCount++;
         }
       });
       
+      console.log(`Will update ${userUpdateCount} users to remove project reference`);
+      
       // Delete the project document
-      const projectRef = doc(db, 'projects', uid);
+      console.log('Adding project deletion to batch...');
       batch.delete(projectRef);
       
       // Execute all operations
+      console.log('Committing batch operations...');
       await batch.commit();
       console.log('Project deleted successfully from Firestore and user references cleaned up');
+      console.log('=== END PROJECT SERVICE DELETE ===');
     } catch (error) {
+      console.error('=== PROJECT DELETE ERROR ===');
       console.error('Error deleting project:', error);
+      console.error('Error type:', typeof error);
+      console.error('Error constructor:', error?.constructor?.name);
+      
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
+      
+      console.error('=== END PROJECT DELETE ERROR ===');
       throw error;
     }
   },

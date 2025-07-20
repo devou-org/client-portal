@@ -22,21 +22,40 @@ export default function ProjectsPage() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   const loadProjects = useCallback(async () => {
+    console.log('=== LOAD PROJECTS DEBUG ===');
+    console.log('User:', user?.email);
+    console.log('IsAdmin:', isAdmin);
+    
     try {
       setLoading(true);
       if (isAdmin) {
+        console.log('Loading all projects for admin...');
         // Admin sees all projects
         const allProjects = await projectService.getAllProjects();
+        console.log('Loaded projects count:', allProjects.length);
+        console.log('Projects:', allProjects.map(p => ({ uid: p.uid, project_name: p.project_name })));
         setProjects(allProjects);
       } else if (user) {
+        console.log('Loading user projects for client...');
         // Client sees only their projects
         const userProjects = await projectService.getUserProjects(user.uid);
+        console.log('Loaded user projects count:', userProjects.length);
+        console.log('User projects:', userProjects.map(p => ({ uid: p.uid, project_name: p.project_name })));
         setProjects(userProjects);
+      } else {
+        console.log('No user found, setting empty projects');
+        setProjects([]);
       }
     } catch (error) {
       console.error('Error loading projects:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load projects",
+      });
     } finally {
       setLoading(false);
+      console.log('=== END LOAD PROJECTS DEBUG ===');
     }
   }, [isAdmin, user]);
 
@@ -55,6 +74,11 @@ export default function ProjectsPage() {
   };
 
   const handleDeleteProject = async (projectId: string) => {
+    console.log('=== DELETE PROJECT DEBUG ===');
+    console.log('User:', user?.email);
+    console.log('IsAdmin:', isAdmin);
+    console.log('Project ID to delete:', projectId);
+    
     if (!isAdmin) {
       console.error('Delete action not allowed: User is not admin');
       toast({
@@ -65,13 +89,29 @@ export default function ProjectsPage() {
       return;
     }
     
+    if (!projectId) {
+      console.error('No project ID provided');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Invalid project ID.",
+      });
+      return;
+    }
+    
     console.log('Attempting to delete project:', projectId);
     
     if (window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
       try {
-        console.log('Calling projectService.deleteProject...');
+        console.log('User confirmed deletion, calling projectService.deleteProject...');
+        
+        // Show loading state
+        setLoading(true);
+        
         await projectService.deleteProject(projectId);
         console.log('Project deleted successfully, reloading projects...');
+        
+        // Force reload projects
         await loadProjects();
         console.log('Projects reloaded successfully');
         
@@ -82,13 +122,24 @@ export default function ProjectsPage() {
         });
       } catch (error) {
         console.error('Error deleting project:', error);
+        console.error('Error details:', {
+          name: error instanceof Error ? error.name : 'Unknown',
+          message: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : 'No stack trace'
+        });
+        
         toast({
           variant: "destructive",
           title: "Delete Failed",
           description: `Failed to delete project: ${error instanceof Error ? error.message : 'Unknown error'}`,
         });
+      } finally {
+        setLoading(false);
       }
+    } else {
+      console.log('User cancelled deletion');
     }
+    console.log('=== END DELETE PROJECT DEBUG ===');
   };
 
   const handleFormSuccess = () => {
