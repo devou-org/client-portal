@@ -75,9 +75,10 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
       }
 
       onSuccess();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving user:', error);
-      alert(error.message || 'Error saving user. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Error saving user. Please try again.';
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }

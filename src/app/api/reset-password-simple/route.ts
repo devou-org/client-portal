@@ -37,62 +37,75 @@ export async function POST(request: NextRequest) {
         message: 'Password reset email sent successfully to your Gmail account'
       });
 
-    } catch (firebaseError: any) {
+    } catch (firebaseError: unknown) {
       console.error('Firebase password reset error:', firebaseError);
-      console.error('Error code:', firebaseError.code);
-      console.error('Error message:', firebaseError.message);
       
-      // Handle specific Firebase errors
-      if (firebaseError.code === 'auth/user-not-found') {
-        console.log('Firebase Auth: User not found');
-        return NextResponse.json(
-          { error: 'No account found with this email address. Please contact administrator for account creation.' },
-          { status: 404 }
-        );
-      }
-      
-      if (firebaseError.code === 'auth/invalid-email') {
-        console.log('Firebase Auth: Invalid email');
-        return NextResponse.json(
-          { error: 'Invalid email address format' },
-          { status: 400 }
-        );
-      }
-
-      if (firebaseError.code === 'auth/too-many-requests') {
-        console.log('Firebase Auth: Too many requests');
-        return NextResponse.json(
-          { error: 'Too many reset attempts. Please try again later.' },
-          { status: 429 }
-        );
-      }
-
-      if (firebaseError.code === 'auth/missing-continue-uri') {
-        console.log('Firebase Auth: Missing continue URI');
-        // Try without the continue URL
-        try {
-          await sendPasswordResetEmail(auth, email);
-          return NextResponse.json({ 
-            success: true, 
-            message: 'Password reset email sent successfully to your Gmail account'
-          });
-        } catch (retryError: any) {
-          console.error('Retry failed:', retryError);
+      // Type guard to check if it's a Firebase error
+      if (firebaseError && typeof firebaseError === 'object' && 'code' in firebaseError && 'message' in firebaseError) {
+        const error = firebaseError as { code: string; message: string };
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        
+        // Handle specific Firebase errors
+        if (error.code === 'auth/user-not-found') {
+          console.log('Firebase Auth: User not found');
           return NextResponse.json(
-            { error: `Failed to send password reset email: ${retryError.message}` },
-            { status: 500 }
+            { error: 'No account found with this email address. Please contact administrator for account creation.' },
+            { status: 404 }
           );
         }
+        
+        if (error.code === 'auth/invalid-email') {
+          console.log('Firebase Auth: Invalid email');
+          return NextResponse.json(
+            { error: 'Invalid email address format' },
+            { status: 400 }
+          );
+        }
+
+        if (error.code === 'auth/too-many-requests') {
+          console.log('Firebase Auth: Too many requests');
+          return NextResponse.json(
+            { error: 'Too many reset attempts. Please try again later.' },
+            { status: 429 }
+          );
+        }
+
+        if (error.code === 'auth/missing-continue-uri') {
+          console.log('Firebase Auth: Missing continue URI');
+          // Try without the continue URL
+          try {
+            await sendPasswordResetEmail(auth, email);
+            return NextResponse.json({ 
+              success: true, 
+              message: 'Password reset email sent successfully to your Gmail account'
+            });
+          } catch (retryError: unknown) {
+            console.error('Retry failed:', retryError);
+            const retryMessage = retryError instanceof Error ? retryError.message : 'Unknown error occurred';
+            return NextResponse.json(
+              { error: `Failed to send password reset email: ${retryMessage}` },
+              { status: 500 }
+            );
+          }
+        }
+
+        console.log('Firebase Auth: Generic error, returning 500');
+        return NextResponse.json(
+          { error: `Failed to send password reset email: ${error.message}` },
+          { status: 500 }
+        );
       }
 
-      console.log('Firebase Auth: Generic error, returning 500');
+      // Fallback for unknown error types
+      console.log('Firebase Auth: Unknown error type, returning 500');
       return NextResponse.json(
-        { error: `Failed to send password reset email: ${firebaseError.message}` },
+        { error: 'Failed to send password reset email' },
         { status: 500 }
       );
     }
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Password reset error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

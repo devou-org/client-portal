@@ -64,29 +64,34 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating user:', error);
 
-    // Handle specific Firebase Auth errors
-    if (error.code === 'auth/email-already-in-use') {
-      return NextResponse.json(
-        { error: 'Email is already in use' },
-        { status: 409 }
-      );
-    }
+    // Type guard to check if it's a Firebase error
+    if (error && typeof error === 'object' && 'code' in error) {
+      const firebaseError = error as { code: string };
+      
+      // Handle specific Firebase Auth errors
+      if (firebaseError.code === 'auth/email-already-in-use') {
+        return NextResponse.json(
+          { error: 'Email is already in use' },
+          { status: 409 }
+        );
+      }
 
-    if (error.code === 'auth/invalid-email') {
-      return NextResponse.json(
-        { error: 'Invalid email address' },
-        { status: 400 }
-      );
-    }
+      if (firebaseError.code === 'auth/invalid-email') {
+        return NextResponse.json(
+          { error: 'Invalid email address' },
+          { status: 400 }
+        );
+      }
 
-    if (error.code === 'auth/weak-password') {
-      return NextResponse.json(
-        { error: 'Password is too weak' },
-        { status: 400 }
-      );
+      if (firebaseError.code === 'auth/weak-password') {
+        return NextResponse.json(
+          { error: 'Password is too weak' },
+          { status: 400 }
+        );
+      }
     }
 
     return NextResponse.json(

@@ -42,7 +42,7 @@ export default function ResetPasswordPage() {
         const userEmail = await verifyPasswordResetCode(auth, oobCode);
         setEmail(userEmail);
         setValidCode(true);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error verifying reset code:', error);
         setValidCode(false);
         toast({
@@ -131,17 +131,22 @@ export default function ResetPasswordPage() {
         router.push('/login');
       }, 3000);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error resetting password:', error);
       
       let errorMessage = 'Failed to reset password. Please try again.';
       
-      if (error.code === 'auth/expired-action-code') {
-        errorMessage = 'This reset link has expired. Please request a new password reset.';
-      } else if (error.code === 'auth/invalid-action-code') {
-        errorMessage = 'This reset link is invalid. Please request a new password reset.';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'Password is too weak. Please choose a stronger password.';
+      // Type guard to check if it's a Firebase error
+      if (error && typeof error === 'object' && 'code' in error) {
+        const firebaseError = error as { code: string };
+        
+        if (firebaseError.code === 'auth/expired-action-code') {
+          errorMessage = 'This reset link has expired. Please request a new password reset.';
+        } else if (firebaseError.code === 'auth/invalid-action-code') {
+          errorMessage = 'This reset link is invalid. Please request a new password reset.';
+        } else if (firebaseError.code === 'auth/weak-password') {
+          errorMessage = 'Password is too weak. Please choose a stronger password.';
+        }
       }
       
       toast({
