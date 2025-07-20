@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Layout } from '@/components/Layout';
@@ -46,9 +46,9 @@ export default function UsersPage() {
     if (isAdmin) {
       loadUsers();
     }
-  }, [isAdmin]);
+  }, [isAdmin, loadUsers]);
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
       const allUsers = await userService.getAllUsers();
@@ -59,7 +59,7 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const loadUserStats = async (userList: User[]) => {
     try {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Layout } from '@/components/Layout';
@@ -20,9 +20,9 @@ export default function DocumentsPage() {
 
   useEffect(() => {
     loadDocuments();
-  }, [user, isAdmin]);
+  }, [user, isAdmin, loadDocuments]);
 
-  const loadDocuments = async () => {
+  const loadDocuments = useCallback(async () => {
     try {
       setLoading(true);
       if (isAdmin) {
@@ -39,7 +39,7 @@ export default function DocumentsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAdmin, user]);
 
   const handleCreateDocument = () => {
     setEditingDocument(null);

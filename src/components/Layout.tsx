@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { 
   LogOut, 
   User, 
-  Settings, 
   Home,
   FileText,
   CreditCard,

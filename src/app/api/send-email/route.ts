@@ -23,7 +23,14 @@ export async function POST(request: NextRequest) {
       ? `${fromName} via Client Portal <${fromEmail}>`
       : `Client Portal <${fromEmail}>`;
 
-    const emailData: any = {
+    const emailData: {
+      from: string;
+      to: string[];
+      subject: string;
+      html: string;
+      text?: string;
+      reply_to?: string;
+    } = {
       from: fromAddress,
       to: Array.isArray(to) ? to : [to],
       subject,
@@ -33,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Add reply-to if provided
     if (replyTo) {
-      emailData.replyTo = replyTo;
+      emailData.reply_to = replyTo;
     }
 
     const result = await resend.emails.send(emailData);

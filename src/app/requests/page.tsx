@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Layout } from '@/components/Layout';
@@ -28,9 +28,9 @@ export default function ServiceRequestsPage() {
 
       return unsubscribe;
     }
-  }, [user]);
+  }, [user, loadRequests]);
 
-  const loadRequests = async () => {
+  const loadRequests = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -42,7 +42,7 @@ export default function ServiceRequestsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   const getStatusIcon = (status: ServiceRequest['status']) => {
     switch (status) {

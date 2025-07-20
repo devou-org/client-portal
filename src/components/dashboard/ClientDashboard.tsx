@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -42,9 +42,9 @@ export function ClientDashboard() {
     if (user) {
       loadDashboardData();
     }
-  }, [user]);
+  }, [user, loadDashboardData]);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -73,7 +73,7 @@ export function ClientDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   if (loading) {
     return (

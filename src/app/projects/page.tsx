@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Layout } from '@/components/Layout';
@@ -21,9 +21,9 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     loadProjects();
-  }, [user, isAdmin]);
+  }, [user, isAdmin, loadProjects]);
 
-  const loadProjects = async () => {
+  const loadProjects = useCallback(async () => {
     try {
       setLoading(true);
       if (isAdmin) {
@@ -40,7 +40,7 @@ export default function ProjectsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAdmin, user]);
 
   const handleCreateProject = () => {
     setEditingProject(null);

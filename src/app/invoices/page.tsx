@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Layout } from '@/components/Layout';
@@ -21,9 +21,9 @@ export default function InvoicesPage() {
 
   useEffect(() => {
     loadInvoices();
-  }, [user, isAdmin]);
+  }, [user, isAdmin, loadInvoices]);
 
-  const loadInvoices = async () => {
+  const loadInvoices = useCallback(async () => {
     try {
       setLoading(true);
       if (isAdmin) {
@@ -40,7 +40,7 @@ export default function InvoicesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAdmin, user]);
 
   const handleCreateInvoice = () => {
     setEditingInvoice(null);

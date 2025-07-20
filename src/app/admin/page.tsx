@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { 
   Users, 
   FolderOpen, 
-  CreditCard, 
   FileText, 
   MessageSquare,
   TrendingUp,
