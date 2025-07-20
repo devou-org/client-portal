@@ -146,17 +146,38 @@ export const userService = {
 export const projectService = {
   async getUserProjects(userUid: string): Promise<Project[]> {
     try {
+      console.log('=== GET USER PROJECTS DEBUG ===');
+      console.log('Getting projects for user:', userUid);
+      
       const user = await userService.getUser(userUid);
-      if (!user || !user.projects.length) return [];
+      if (!user || !user.projects.length) {
+        console.log('No user found or no projects for user');
+        return [];
+      }
 
+      console.log('User projects array:', user.projects);
       const projects: Project[] = [];
+      
       for (const projectId of user.projects) {
+        console.log('Fetching project:', projectId);
         const projectDoc = await getDoc(doc(db, 'projects', projectId));
         if (projectDoc.exists()) {
           const data = convertTimestamps(projectDoc.data());
-          projects.push({ uid: projectDoc.id, ...data } as Project);
+          console.log('Project document ID:', projectDoc.id);
+          console.log('Project data:', data);
+          console.log('Data uid field:', data.uid);
+          
+          // Use document ID as the uid, regardless of what's in the data
+          const project = { ...data, uid: projectDoc.id } as Project;
+          console.log('Final project uid:', project.uid);
+          projects.push(project);
+        } else {
+          console.warn('Project document not found:', projectId);
         }
       }
+      
+      console.log('Total user projects loaded:', projects.length);
+      console.log('=== END GET USER PROJECTS DEBUG ===');
       return projects;
     } catch (error) {
       console.error('Error getting user projects:', error);
@@ -166,12 +187,25 @@ export const projectService = {
 
   async getAllProjects(): Promise<Project[]> {
     try {
+      console.log('=== GET ALL PROJECTS DEBUG ===');
       const projectsRef = collection(db, 'projects');
       const snapshot = await getDocs(query(projectsRef, orderBy('createdAt', 'desc')));
-      return snapshot.docs.map(doc => {
+      
+      const projects = snapshot.docs.map(doc => {
         const data = convertTimestamps(doc.data());
-        return { uid: doc.id, ...data } as Project;
+        console.log('Document ID:', doc.id);
+        console.log('Document data:', data);
+        console.log('Data uid field:', data.uid);
+        
+        // Use document ID as the uid, regardless of what's in the data
+        const project = { ...data, uid: doc.id } as Project;
+        console.log('Final project uid:', project.uid);
+        return project;
       });
+      
+      console.log('Total projects loaded:', projects.length);
+      console.log('=== END GET ALL PROJECTS DEBUG ===');
+      return projects;
     } catch (error) {
       console.error('Error getting all projects:', error);
       throw error;
