@@ -11,6 +11,7 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { User, AuthContextType } from '@/types';
 import { isAdmin as checkIsAdmin } from '@/lib/utils';
+import { safeToDate } from '@/lib/timestamp-utils';
 import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -90,6 +91,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.log('User document exists, updating...');
         // User exists in database, update and login
         const existingData = userDoc.data();
+        
         const userData: User = {
           uid: firebaseUser.uid,
           name: existingData.name || name || '',
@@ -98,8 +100,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           invoices: existingData.invoices || [],
           documents: existingData.documents || [],
           requests: existingData.requests || [],
-          createdAt: existingData.createdAt?.toDate(),
-          updatedAt: existingData.updatedAt?.toDate(),
+          createdAt: safeToDate(existingData.createdAt),
+          updatedAt: safeToDate(existingData.updatedAt),
         };
 
         // Update the document with any new info

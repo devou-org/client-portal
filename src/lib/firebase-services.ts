@@ -15,6 +15,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { safeToDate } from '@/lib/timestamp-utils';
 import {
   User,
   Project,
@@ -33,8 +34,8 @@ import {
 const convertTimestamps = (data: Record<string, unknown>) => {
   const converted = { ...data };
   Object.keys(converted).forEach(key => {
-    if (converted[key] instanceof Timestamp) {
-      converted[key] = (converted[key] as Timestamp).toDate();
+    if (converted[key] && typeof converted[key] === 'object') {
+      converted[key] = safeToDate(converted[key]) || converted[key];
     }
   });
   return converted;
