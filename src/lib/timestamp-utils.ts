@@ -1,6 +1,4 @@
 // Utility function to safely convert Firestore timestamps to Date objects
-export const safeToDate = (timestamp: unknown): Date | undefined => {
-  if (!timestamp) return undefined;Helper function to safely convert Firestore timestamps to Date objects
 export const safeToDate = (timestamp: any): Date | undefined => {
   if (!timestamp) return undefined;
   
