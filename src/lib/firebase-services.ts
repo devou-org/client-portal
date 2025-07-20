@@ -12,7 +12,6 @@ import {
   onSnapshot,
   serverTimestamp,
   writeBatch,
-  Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { safeToDate } from '@/lib/timestamp-utils';
@@ -118,9 +117,9 @@ export const userService = {
       // Clean up user's projects (remove user from project references)
       if (user.projects && user.projects.length > 0) {
         for (const projectId of user.projects) {
-          const projectRef = doc(db, 'projects', projectId);
           // You might want to delete the project or reassign it
           // For now, we'll leave projects but remove user reference
+          console.log(`Project ${projectId} needs manual cleanup`);
         }
       }
 

@@ -123,7 +123,7 @@ export class FileUploadService {
       // Remove timestamp prefix if present (format: timestamp-filename)
       const match = filenamePart.match(/^\d+-(.+)$/);
       return match ? match[1] : filenamePart;
-    } catch (error) {
+    } catch (_error) {
       return 'Unknown file';
     }
   }
