@@ -1,9 +1,19 @@
+// Type definition for possible timestamp formats
+type TimestampInput = 
+  | { toDate: () => Date }  // Firestore Timestamp
+  | { seconds: number; nanoseconds: number }  // Timestamp-like object
+  | Date  // Already a Date
+  | string  // ISO string or parseable date string
+  | number  // Unix timestamp
+  | null
+  | undefined;
+
 // Utility function to safely convert Firestore timestamps to Date objects
-export const safeToDate = (timestamp: any): Date | undefined => {
+export const safeToDate = (timestamp: TimestampInput): Date | undefined => {
   if (!timestamp) return undefined;
   
   // Check if it's a proper Firestore Timestamp
-  if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+  if (typeof timestamp === 'object' && timestamp !== null && 'toDate' in timestamp && typeof timestamp.toDate === 'function') {
     try {
       return timestamp.toDate();
     } catch (error) {
@@ -13,7 +23,7 @@ export const safeToDate = (timestamp: any): Date | undefined => {
   }
   
   // Check if it's a timestamp-like object with seconds
-  if (timestamp.seconds && timestamp.nanoseconds !== undefined) {
+  if (typeof timestamp === 'object' && timestamp !== null && 'seconds' in timestamp && 'nanoseconds' in timestamp) {
     return new Date(timestamp.seconds * 1000);
   }
   

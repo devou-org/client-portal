@@ -34,7 +34,7 @@ const convertTimestamps = (data: Record<string, unknown>) => {
   const converted = { ...data };
   Object.keys(converted).forEach(key => {
     if (converted[key] && typeof converted[key] === 'object') {
-      converted[key] = safeToDate(converted[key]) || converted[key];
+      converted[key] = safeToDate(converted[key] as any) || converted[key];
     }
   });
   return converted;
