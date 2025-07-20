@@ -35,7 +35,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('AuthContext: Setting up auth state listener');
+    
+    // Check if Firebase config is loaded
+    if (!auth) {
+      console.error('Firebase auth not initialized');
+      setAuthError('Firebase configuration error');
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log('AuthContext: Auth state changed', firebaseUser?.email);
       setLoading(true);
       setAuthError(null);
       
@@ -49,6 +60,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setIsAdmin(false);
         }
       } else {
+        console.log('AuthContext: No user signed in');
         setUser(null);
         setIsAdmin(false);
       }
@@ -61,13 +73,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const handleUserLogin = async (firebaseUser: FirebaseUser, name?: string) => {
     try {
+      console.log('Handling user login for:', firebaseUser.email);
+      
+      if (!db) {
+        throw new Error('Firestore database not initialized');
+      }
+      
       const userDocRef = doc(db, 'users', firebaseUser.uid);
       const userDoc = await getDoc(userDocRef);
 
       // Check if user is admin by email
       const isUserAdmin = checkIsAdmin(firebaseUser.email || '');
+      console.log('User admin status:', isUserAdmin);
 
       if (userDoc.exists()) {
+        console.log('User document exists, updating...');
         // User exists in database, update and login
         const existingData = userDoc.data();
         const userData: User = {
@@ -93,6 +113,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(userData);
         setIsAdmin(isUserAdmin);
       } else {
+        console.log('Creating new user document...');
         // User doesn't exist, create new user document
         const userData: User = {
           uid: firebaseUser.uid,
@@ -113,6 +134,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(userData);
         setIsAdmin(isUserAdmin);
       }
+      
+      console.log('User login handled successfully');
     } catch (error) {
       console.error('Error handling user login:', error);
       
@@ -126,7 +149,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signInWithEmailPassword = async (email: string, password: string, name?: string) => {
     try {
+      console.log('Attempting to sign in with email:', email);
+      setAuthError(null);
+      
+      if (!auth) {
+        throw new Error('Firebase auth not initialized');
+      }
+      
       const result = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Sign in successful:', result.user.email);
       
       // If name is provided (first time login), update the user document
       if (name) {
@@ -136,6 +167,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
     } catch (error) {
       console.error('Error signing in with email/password:', error);
+      
+      // Provide user-friendly error messages
+      if (error && typeof error === 'object' && 'code' in error) {
+        const firebaseError = error as { code: string; message: string };
+        switch (firebaseError.code) {
+          case 'auth/user-not-found':
+            throw new Error('No account found with this email address.');
+          case 'auth/wrong-password':
+            throw new Error('Incorrect password. Please try again.');
+          case 'auth/invalid-email':
+            throw new Error('Invalid email address format.');
+          case 'auth/user-disabled':
+            throw new Error('This account has been disabled.');
+          case 'auth/too-many-requests':
+            throw new Error('Too many failed login attempts. Please try again later.');
+          default:
+            throw new Error(`Login failed: ${firebaseError.message}`);
+        }
+      }
       
       // Re-throw the error so the UI can handle it
       throw error;
