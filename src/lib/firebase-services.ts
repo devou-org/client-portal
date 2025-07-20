@@ -637,6 +637,23 @@ export const requestService = {
           requests: [...user.requests, docRef.id],
           updatedAt: serverTimestamp(),
         });
+
+        // Send email notification to info@devou.in
+        try {
+          const { EmailService } = await import('@/lib/email-service');
+          await EmailService.sendServiceRequestNotification({
+            userName: user.name,
+            userEmail: user.email,
+            requestName: requestData.name,
+            requestDescription: requestData.description,
+            priority: requestData.priority || 'medium',
+            submittedAt: new Date(),
+          });
+          console.log('Email notification sent successfully');
+        } catch (emailError) {
+          console.error('Failed to send email notification:', emailError);
+          // Don't throw error - request creation should succeed even if email fails
+        }
       }
 
       return docRef.id;

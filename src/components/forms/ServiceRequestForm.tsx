@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Plus, Loader2 } from 'lucide-react';
 import { requestService } from '@/lib/firebase-services';
 import { CreateServiceRequestForm } from '@/types';
+import { useToast } from '@/hooks/use-toast';
 
 interface ServiceRequestFormProps {
   onSuccess?: () => void;
@@ -15,6 +16,7 @@ interface ServiceRequestFormProps {
 
 export function ServiceRequestForm({ onSuccess }: ServiceRequestFormProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateServiceRequestForm>({
@@ -46,9 +48,24 @@ export function ServiceRequestForm({ onSuccess }: ServiceRequestFormProps) {
         priority: 'medium',
       });
       setIsOpen(false);
+      
+      // Show success toast
+      toast({
+        variant: "success",
+        title: "Service Request Submitted!",
+        description: "Your request has been submitted and an email notification has been sent to our team. We'll get back to you soon.",
+      });
+      
       onSuccess?.();
     } catch (error) {
       console.error('Error creating service request:', error);
+      
+      // Show error toast
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to submit your request. Please try again.",
+      });
     } finally {
       setLoading(false);
     }

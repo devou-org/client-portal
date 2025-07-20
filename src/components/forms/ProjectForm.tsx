@@ -179,7 +179,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Budget ($)
+          Budget (₹)
         </label>
         <Input
           type="number"

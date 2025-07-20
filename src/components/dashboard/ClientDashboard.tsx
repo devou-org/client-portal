@@ -119,7 +119,7 @@ export function ClientDashboard() {
               <div>
                 <p className="text-xs sm:text-sm font-medium text-gray-600">Total Paid</p>
                 <p className="text-xl sm:text-2xl font-bold text-green-600">
-                  {paymentSummary ? formatCurrency(paymentSummary.totalPaid) : '$0'}
+                  {paymentSummary ? formatCurrency(paymentSummary.totalPaid) : '₹0'}
                 </p>
               </div>
               <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
@@ -133,7 +133,7 @@ export function ClientDashboard() {
               <div>
                 <p className="text-xs sm:text-sm font-medium text-gray-600">Pending Amount</p>
                 <p className="text-xl sm:text-2xl font-bold text-yellow-600">
-                  {paymentSummary ? formatCurrency(paymentSummary.pending + paymentSummary.due) : '$0'}
+                  {paymentSummary ? formatCurrency(paymentSummary.pending + paymentSummary.due) : '₹0'}
                 </p>
               </div>
               <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-600" />

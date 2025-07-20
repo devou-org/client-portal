@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -171,12 +172,13 @@ export default function UsersPage() {
   const stats = getTotalStats();
 
   return (
-    <Layout>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 space-y-4 sm:space-y-0">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">User Management</h1>
-            <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage all users and their permissions</p>
+    <AuthGuard requireAdmin>
+      <Layout>
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 space-y-4 sm:space-y-0">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">User Management</h1>
+              <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage all users and their permissions</p>
           </div>
           <div className="flex gap-2">
             <Button 
@@ -394,5 +396,6 @@ export default function UsersPage() {
         </Card>
       </div>
     </Layout>
+  </AuthGuard>
   );
 }

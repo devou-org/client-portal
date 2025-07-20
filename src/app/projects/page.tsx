@@ -92,15 +92,16 @@ export default function ProjectsPage() {
   }
 
   return (
-    <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-            <p className="text-gray-600 mt-1">
-              {isAdmin ? 'Manage all projects' : 'View your projects'}
-            </p>
-          </div>
+    <AuthGuard>
+      <Layout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
+              <p className="text-gray-600 mt-1">
+                {isAdmin ? 'Manage all projects' : 'View your projects'}
+              </p>
+            </div>
           {isAdmin && (
             <Button onClick={handleCreateProject} className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
@@ -160,7 +161,7 @@ export default function ProjectsPage() {
                   )}
                   <div className="flex items-center text-sm text-gray-500">
                     <User className="h-4 w-4 mr-2" />
-                    Budget: ${project.budget?.toLocaleString() || 'Not set'}
+                    Budget: ₹{project.budget?.toLocaleString() || 'Not set'}
                   </div>
                 </div>
 
@@ -210,5 +211,6 @@ export default function ProjectsPage() {
         )}
       </div>
     </Layout>
+    </AuthGuard>
   );
 }

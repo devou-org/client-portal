@@ -16,6 +16,7 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password: '',
     isAdmin: false,
   });
   const [loading, setLoading] = useState(false);
@@ -25,6 +26,7 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
       setFormData({
         name: user.name,
         email: user.email,
+        password: '', // Password not needed for updates
         isAdmin: user.isAdmin || false,
       });
     }
@@ -43,17 +45,39 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
           isAdmin: formData.isAdmin,
         });
       } else {
-        // Note: Creating new users typically requires Firebase Admin SDK
-        // For now, we'll show a message about this limitation
-        alert('Creating new users requires Firebase Admin SDK implementation. This would typically be done through a backend API.');
-        onCancel();
-        return;
+        // Create new user via API
+        if (!formData.password) {
+          alert('Password is required for new users');
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch('/api/admin/create-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            role: formData.isAdmin ? 'admin' : 'client',
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to create user');
+        }
+
+        alert('User created successfully!');
       }
 
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving user:', error);
-      alert('Error saving user. Please try again.');
+      alert(error.message || 'Error saving user. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -93,6 +117,25 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
         )}
       </div>
 
+      {!user && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Password *
+          </label>
+          <Input
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            required
+            placeholder="Enter password (min. 6 characters)"
+            minLength={6}
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            Password must be at least 6 characters long
+          </p>
+        </div>
+      )}
+
       <div>
         <label className="flex items-center space-x-2">
           <input
@@ -118,29 +161,6 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
           {loading ? 'Saving...' : user ? 'Update User' : 'Create User'}
         </Button>
       </div>
-
-      {!user && (
-        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">
-                Note about user creation
-              </h3>
-              <div className="mt-2 text-sm text-yellow-700">
-                <p>
-                  Creating new users requires Firebase Admin SDK and would typically be handled by a backend API. 
-                  In a production environment, you would implement user invitation flows with proper authentication setup.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </form>
   );
 }

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { DevouLogo } from '@/components/ui/DevouLogo';
 import { LogIn, Loader2, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -110,8 +111,15 @@ export function LoginForm() {
             </Button>
           </form>
           
-          <div className="text-center text-sm text-gray-500 mt-4">
-            <p className="text-xs">
+          <div className="text-center space-y-3 mt-4">
+            <Link 
+              href="/forgot-password" 
+              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              Forgot your password?
+            </Link>
+            
+            <p className="text-xs text-gray-500">
               Contact administrator if you don&apos;t have login credentials
             </p>
           </div>

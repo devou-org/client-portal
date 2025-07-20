@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -118,15 +119,16 @@ export default function InvoicesPage() {
   }
 
   return (
-    <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Invoices</h1>
-            <p className="text-gray-600 mt-1">
-              {isAdmin ? 'Manage all invoices' : 'View your invoices'}
-            </p>
-          </div>
+    <AuthGuard>
+      <Layout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Invoices</h1>
+              <p className="text-gray-600 mt-1">
+                {isAdmin ? 'Manage all invoices' : 'View your invoices'}
+              </p>
+            </div>
           {isAdmin && (
             <Button onClick={handleCreateInvoice} className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
@@ -180,7 +182,7 @@ export default function InvoicesPage() {
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center text-lg font-semibold text-green-600">
                     <DollarSign className="h-5 w-5 mr-1" />
-                    ${invoice.amount.toLocaleString()}
+                    ₹{invoice.amount.toLocaleString()}
                   </div>
                   
                   <div className="flex items-center text-sm text-gray-500">
@@ -248,5 +250,6 @@ export default function InvoicesPage() {
         )}
       </div>
     </Layout>
+    </AuthGuard>
   );
 }
