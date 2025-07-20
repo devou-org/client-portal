@@ -19,10 +19,6 @@ export default function ProjectsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
-  useEffect(() => {
-    loadProjects();
-  }, [user, isAdmin, loadProjects]);
-
   const loadProjects = useCallback(async () => {
     try {
       setLoading(true);
@@ -41,6 +37,10 @@ export default function ProjectsPage() {
       setLoading(false);
     }
   }, [isAdmin, user]);
+
+  useEffect(() => {
+    loadProjects();
+  }, [user, isAdmin, loadProjects]);
 
   const handleCreateProject = () => {
     setEditingProject(null);

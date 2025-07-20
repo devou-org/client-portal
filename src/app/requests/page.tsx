@@ -17,19 +17,6 @@ export default function ServiceRequestsPage() {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      loadRequests();
-      
-      // Set up real-time listener
-      const unsubscribe = requestService.onUserRequestsChange(user.uid, (updatedRequests) => {
-        setRequests(updatedRequests);
-      });
-
-      return unsubscribe;
-    }
-  }, [user, loadRequests]);
-
   const loadRequests = useCallback(async () => {
     if (!user) return;
     
@@ -43,6 +30,19 @@ export default function ServiceRequestsPage() {
       setLoading(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadRequests();
+      
+      // Set up real-time listener
+      const unsubscribe = requestService.onUserRequestsChange(user.uid, (updatedRequests) => {
+        setRequests(updatedRequests);
+      });
+
+      return unsubscribe;
+    }
+  }, [user, loadRequests]);
 
   const getStatusIcon = (status: ServiceRequest['status']) => {
     switch (status) {

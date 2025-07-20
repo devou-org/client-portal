@@ -18,10 +18,6 @@ export default function DocumentsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingDocument, setEditingDocument] = useState<Document | null>(null);
 
-  useEffect(() => {
-    loadDocuments();
-  }, [user, isAdmin, loadDocuments]);
-
   const loadDocuments = useCallback(async () => {
     try {
       setLoading(true);
@@ -40,6 +36,10 @@ export default function DocumentsPage() {
       setLoading(false);
     }
   }, [isAdmin, user]);
+
+  useEffect(() => {
+    loadDocuments();
+  }, [user, isAdmin, loadDocuments]);
 
   const handleCreateDocument = () => {
     setEditingDocument(null);

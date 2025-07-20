@@ -42,26 +42,7 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [loadingStats, setLoadingStats] = useState(false);
 
-  useEffect(() => {
-    if (isAdmin) {
-      loadUsers();
-    }
-  }, [isAdmin, loadUsers]);
-
-  const loadUsers = useCallback(async () => {
-    try {
-      setLoading(true);
-      const allUsers = await userService.getAllUsers();
-      setUsers(allUsers);
-      await loadUserStats(allUsers);
-    } catch (error) {
-      console.error('Error loading users:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const loadUserStats = async (userList: User[]) => {
+  const loadUserStats = useCallback(async (userList: User[]) => {
     try {
       setLoadingStats(true);
       const stats: Record<string, UserStats> = {};
@@ -97,7 +78,26 @@ export default function UsersPage() {
     } finally {
       setLoadingStats(false);
     }
-  };
+  }, []);
+
+  const loadUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const allUsers = await userService.getAllUsers();
+      setUsers(allUsers);
+      await loadUserStats(allUsers);
+    } catch (error) {
+      console.error('Error loading users:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [loadUserStats]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      loadUsers();
+    }
+  }, [isAdmin, loadUsers]);
 
   const handleCreateUser = () => {
     setEditingUser(null);

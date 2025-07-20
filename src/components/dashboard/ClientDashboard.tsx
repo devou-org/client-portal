@@ -38,12 +38,6 @@ export function ClientDashboard() {
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      loadDashboardData();
-    }
-  }, [user, loadDashboardData]);
-
   const loadDashboardData = useCallback(async () => {
     if (!user) return;
     
@@ -74,6 +68,12 @@ export function ClientDashboard() {
       setLoading(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user, loadDashboardData]);
 
   if (loading) {
     return (

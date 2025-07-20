@@ -19,10 +19,6 @@ export default function InvoicesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
 
-  useEffect(() => {
-    loadInvoices();
-  }, [user, isAdmin, loadInvoices]);
-
   const loadInvoices = useCallback(async () => {
     try {
       setLoading(true);
@@ -41,6 +37,10 @@ export default function InvoicesPage() {
       setLoading(false);
     }
   }, [isAdmin, user]);
+
+  useEffect(() => {
+    loadInvoices();
+  }, [user, isAdmin, loadInvoices]);
 
   const handleCreateInvoice = () => {
     setEditingInvoice(null);
