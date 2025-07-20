@@ -11,9 +11,11 @@ import { ProjectForm } from '@/components/forms/ProjectForm';
 import { projectService } from '@/lib/firebase-services';
 import { Project } from '@/types';
 import { Plus, Edit, Trash2, Eye, Calendar, User } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProjectsPage() {
   const { user, isAdmin } = useAuth();
+  const { toast } = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -53,14 +55,38 @@ export default function ProjectsPage() {
   };
 
   const handleDeleteProject = async (projectId: string) => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      console.error('Delete action not allowed: User is not admin');
+      toast({
+        variant: "destructive",
+        title: "Permission Denied",
+        description: "You do not have permission to delete projects.",
+      });
+      return;
+    }
     
-    if (window.confirm('Are you sure you want to delete this project?')) {
+    console.log('Attempting to delete project:', projectId);
+    
+    if (window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
       try {
+        console.log('Calling projectService.deleteProject...');
         await projectService.deleteProject(projectId);
+        console.log('Project deleted successfully, reloading projects...');
         await loadProjects();
+        console.log('Projects reloaded successfully');
+        
+        toast({
+          variant: "success",
+          title: "Project Deleted",
+          description: "The project has been successfully deleted.",
+        });
       } catch (error) {
         console.error('Error deleting project:', error);
+        toast({
+          variant: "destructive",
+          title: "Delete Failed",
+          description: `Failed to delete project: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        });
       }
     }
   };

@@ -208,7 +208,31 @@ export const projectService = {
 
   async deleteProject(uid: string): Promise<void> {
     try {
-      await deleteDoc(doc(db, 'projects', uid));
+      console.log('Deleting project from Firestore:', uid);
+      
+      // First, get all users and remove this project from their projects array
+      const usersSnapshot = await getDocs(collection(db, 'users'));
+      const batch = writeBatch(db);
+      
+      usersSnapshot.docs.forEach(userDoc => {
+        const userData = userDoc.data();
+        if (userData.projects && userData.projects.includes(uid)) {
+          console.log(`Removing project ${uid} from user ${userDoc.id}`);
+          const updatedProjects = userData.projects.filter((projectId: string) => projectId !== uid);
+          batch.update(userDoc.ref, { 
+            projects: updatedProjects,
+            updatedAt: serverTimestamp()
+          });
+        }
+      });
+      
+      // Delete the project document
+      const projectRef = doc(db, 'projects', uid);
+      batch.delete(projectRef);
+      
+      // Execute all operations
+      await batch.commit();
+      console.log('Project deleted successfully from Firestore and user references cleaned up');
     } catch (error) {
       console.error('Error deleting project:', error);
       throw error;

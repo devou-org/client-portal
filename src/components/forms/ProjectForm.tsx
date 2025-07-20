@@ -90,7 +90,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 mb-1 cursor-default">
           Project Name *
         </label>
         <Input
@@ -103,7 +103,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 mb-1 cursor-default">
           Description *
         </label>
         <textarea

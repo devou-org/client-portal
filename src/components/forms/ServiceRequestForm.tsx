@@ -88,7 +88,7 @@ export function ServiceRequestForm({ onSuccess }: ServiceRequestFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 cursor-default">
               Request Title *
             </label>
             <Input
@@ -101,7 +101,7 @@ export function ServiceRequestForm({ onSuccess }: ServiceRequestFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 cursor-default">
               Request Type *
             </label>
             <Input
@@ -114,7 +114,7 @@ export function ServiceRequestForm({ onSuccess }: ServiceRequestFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 cursor-default">
               Description *
             </label>
             <textarea
@@ -128,7 +128,7 @@ export function ServiceRequestForm({ onSuccess }: ServiceRequestFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 cursor-default">
               Priority
             </label>
             <select
