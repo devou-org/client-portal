@@ -94,9 +94,7 @@ export function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) {
                 <br />
                 2. Create a new password
                 <br />
-                3. Confirm your new password
-                <br />
-                4. You&apos;ll be redirected to login with your new password
+                3. Back to the login page
               </p>
             </div>
           </div>
@@ -115,10 +113,12 @@ export function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) {
             </Button>
             
             {onBack ? (
-              <Button onClick={onBack} variant="ghost" className="w-full">
+             <Link href="/" className="block">
+               <Button onClick={onBack}  variant="ghost" className="w-full">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Login
-              </Button>
+               </Button>
+             </Link>
             ) : (
               <Link href="/" className="block">
                 <Button variant="ghost" className="w-full">
