@@ -237,7 +237,7 @@ function ResetPasswordContent() {
               <p className="text-sm text-gray-500">
                 You will be redirected to the login page automatically in a few seconds.
               </p>
-              <Link href="/login" className="block">
+              <Link href="/" className="block">
                 <Button className="w-full">
                   Go to Login Now
                 </Button>
