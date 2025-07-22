@@ -116,7 +116,7 @@ export function LoginForm() {
               href="/forgot-password" 
               className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
             >
-              Forgot your password?
+              Forgot your password?rest password
             </Link>
             
             <p className="text-xs text-gray-500">
