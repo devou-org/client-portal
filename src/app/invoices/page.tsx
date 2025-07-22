@@ -181,13 +181,18 @@ export default function InvoicesPage() {
               <CardContent>
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center text-lg font-semibold text-green-600">
-                    <DollarSign className="h-5 w-5 mr-1" />
                     ₹{invoice.amount.toLocaleString()}
                   </div>
                   
                   <div className="flex items-center text-sm text-gray-500">
                     <Calendar className="h-4 w-4 mr-2" />
-                    Due: {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'Not set'}
+                    Due: {(invoice.dueDate || invoice.due_date)
+                      ? new Date(
+                          typeof invoice.dueDate !== 'undefined'
+                            ? invoice.dueDate
+                            : invoice.due_date!
+                        ).toLocaleDateString()
+                      : 'Not set'}
                   </div>
 
                   {invoice.description && (

@@ -60,17 +60,7 @@ export function LoginForm() {
           )}
           
           <form onSubmit={handleSignIn} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium leading-none">Full Name (Optional)</label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Enter your full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              <p className="text-xs text-gray-500">Only fill this if it&apos;s your first time logging in</p>
-            </div>
+          
             
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium leading-none">Email</label>
@@ -116,7 +106,7 @@ export function LoginForm() {
               href="/forgot-password" 
               className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
             >
-              Forgot your password?
+              Forgot your password?Reset password
             </Link>
             
             <p className="text-xs text-gray-500">
