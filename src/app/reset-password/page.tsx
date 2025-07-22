@@ -128,7 +128,7 @@ function ResetPasswordContent() {
 
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        router.push('/login');
+        router.push('/');
       }, 3000);
 
     } catch (error: unknown) {
@@ -199,7 +199,7 @@ function ResetPasswordContent() {
                     Request New Reset Link
                   </Button>
                 </Link>
-                <Link href="/login" className="block">
+                <Link href="/" className="block">
                   <Button variant="outline" className="w-full">
                     Back to Login
                   </Button>

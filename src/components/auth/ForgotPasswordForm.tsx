@@ -209,7 +209,7 @@ export function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) {
                 Back to Login
               </Button>
             ) : (
-              <Link href="/login">
+              <Link href="/">
                 <Button variant="ghost" size="sm">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Login
