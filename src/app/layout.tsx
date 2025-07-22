@@ -9,10 +9,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Client & Admin Portal",
+  title: "Portal",
   description: "A comprehensive portal for clients and administrators",
+  icons: {
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+  },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
