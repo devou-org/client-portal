@@ -243,25 +243,7 @@ export default function UsersPage() {
           </Card>
         </div>
 
-        {/* Info Card */}
-        <Card className="mb-6 sm:mb-8 bg-blue-50 border-blue-200">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-start">
-              <div className="p-2 bg-blue-100 rounded-lg mr-3 sm:mr-4 flex-shrink-0">
-                <MessageSquare className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-blue-900 mb-2">User Management Information</h3>
-                <div className="text-sm text-blue-800 space-y-1">
-                  <p>• <strong>Register users:</strong> Create accounts in Firebase Authentication console</p>
-                  <p>• <strong>User login:</strong> Users login with email/password (provide name on first login)</p>
-                  <p>• <strong>Complete removal:</strong> Delete from both this panel AND Firebase Authentication</p>
-                  <p>• <strong>Admin detection:</strong> Based on email address in admin list</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      
 
         {showForm && (
           <div className="mb-6">
